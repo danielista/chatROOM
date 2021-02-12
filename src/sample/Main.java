@@ -26,8 +26,8 @@ public class Main extends Application {
         tajnosti tj = new tajnosti();
        // new Database().insertNewUser(tj.getLoginChat(),tj.getPasswordChat());
 
-        // posielam spravu :D
-        // new Database().sendMessage(10,"Brano","Sewas Braňo, konečne mi to ide :D");
+        // posielam spravu :D  // Brano      kristianS
+        // new Database().sendMessage(10," ..komu.. "," ..text.. ");
 
         // prezeram všetky spravy premňa ;)
         new Output().printMyMessages(new Database().getMyMessages("DANKO"));

@@ -21,6 +21,7 @@ public class Database {
     private final String newMessage = "INSERT INTO message(fromUser, toUser, text) VALUES (?,?,?)";
     private final String getLoginID = "SELECT id FROM chat2021.user WHERE login LIKE (?) ";
     private final String getMyMESSAGES = "SELECT user.login AS fromWHO, text AS what,dt AS timeWHEN FROM message INNER JOIN chat2021.user ON user.id = message.fromUser WHERE toUser = (?)";
+    private final String deleteMyMessages = "DELETE FROM message WHERE toUser = (?)";
 
 
     private Connection getConnection() throws SQLException, ClassNotFoundException {
@@ -221,7 +222,20 @@ public class Database {
 
     public void deleteAllMyMessages(String login){
 
-        // o chvíľku spravím... no idem najprv spinkať
+        int Idecko = getUserId(login);
+
+        try {
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement( deleteMyMessages );
+            ps.setInt(1,Idecko);
+            ResultSet rs = ps.executeQuery();
+
+
+            con.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 
