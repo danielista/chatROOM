@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 
 public class Database {
 
@@ -238,9 +239,15 @@ public class Database {
 
     }
 
-
     public boolean changePassword(String login , String oldPassword, String newPassword){
-            // o chvíľku spravím... no idem najprv spinkať
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter old password, one more time:");
+        String reallyOldPassword = sc.nextLine();
+
+
+
+            // už už pracujem na tom :D
             return false;
     }
 
