@@ -135,7 +135,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);  // spúšťanie formulára :D
 
-       // tajnosti tj = new tajnosti();
+        tajnosti tj = new tajnosti();
        // new Database().insertNewUser(tj.getLoginChat(),tj.getPasswordChat());
 
         // posielam spravu :D  // Brano      kristianS
@@ -143,6 +143,8 @@ public class Main extends Application {
 
         // prezeram všetky spravy premňa ;)
        // new Output().printMyMessages(new Database().getMyMessages("DANKO"));
+
+      //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
 
     }
 }

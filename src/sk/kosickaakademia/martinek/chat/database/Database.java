@@ -23,6 +23,7 @@ public class Database {
     private final String getLoginID = "SELECT id FROM chat2021.user WHERE login LIKE (?) ";
     private final String getMyMESSAGES = "SELECT user.login AS fromWHO, text AS what,dt AS timeWHEN FROM message INNER JOIN chat2021.user ON user.id = message.fromUser WHERE toUser = (?)";
     private final String deleteMyMessages = "DELETE FROM message WHERE toUser = (?)";
+    private final String updateUserPassword = "UPDATE user SET password = (?) WHERE login LIKE (?) ";
 
 
     private Connection getConnection() throws SQLException, ClassNotFoundException {
@@ -241,9 +242,54 @@ public class Database {
 
     public boolean changePassword(String login , String oldPassword, String newPassword){
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter old password, one more time:");
-        String reallyOldPassword = sc.nextLine();
+        User onlineUser = loginUser(login,oldPassword);
+        if (onlineUser==null){
+            System.out.println("nesprávne staré_heslo alebo meno");
+            return false;
+        }else{
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter new password, one more time, please:");
+            String reallyNewPassword = sc.nextLine();
+            if (reallyNewPassword.equals(newPassword)){
+               // System.out.println("Vaše nové heslo je uložené.");
+
+
+                if(login==null  ||  login.equals("") || oldPassword==null || oldPassword.length()<6 ) return false;
+
+                String hashPassword = new Util().getMd5(newPassword);
+                try{
+                    Connection con = getConnection();
+                    if(con == null){
+                        System.out.println("con = error!!!");
+                        return false;
+                    }
+
+
+                    PreparedStatement ps = con.prepareStatement(updateUserPassword);
+                    ps.setString(1, hashPassword);
+                    ps.setString(2, login);
+                    int result = ps.executeUpdate();
+                    con.close();
+                    if (result == 0)
+                        return false;
+                    else {
+                        System.out.println("YOu changed your password SAXESFULLY!! ");
+                        return true;
+                    }
+
+                }catch (Exception e){
+                    System.out.println("heslo sa nepodarilo zmeniť");
+                    e.printStackTrace();
+                }
+
+            }else {
+                System.out.println("Vaše nové heslo sa nezhoduje so zadaným...");
+                //while //3 pokusy a potom neúspešná zmena hesla
+                return false;
+            }
+        }
+
+
 
 
 
