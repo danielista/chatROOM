@@ -50,7 +50,6 @@ public class Database {
         }
     }
 
-
     public boolean insertNewUser(String login, String password){
             if(login==null  ||  login.equals("") || password==null || password.length()<6 ) return false;
 
@@ -213,6 +212,7 @@ public class Database {
                 Message sprava = new Message(odKOHO,textSPRAVY,casOdoslania);
                 messeges.add(sprava);
 
+              //  deleteAllMyMessages("DANKO");
             }
             con.close();
         }catch (Exception e){
@@ -230,9 +230,10 @@ public class Database {
             Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement( deleteMyMessages );
             ps.setInt(1,Idecko);
-            ResultSet rs = ps.executeQuery();
+            // ResultSet rs = ps.executeQuery();
+            ps.executeUpdate();
 
-
+            System.out.println("schránka je prázdna");
             con.close();
         }catch (Exception e){
             e.printStackTrace();

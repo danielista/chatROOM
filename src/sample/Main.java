@@ -133,18 +133,18 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);  // spúšťanie formulára :D
+       // launch(args);  // spúšťanie formulára :D
 
-        tajnosti tj = new tajnosti();
-       // new Database().insertNewUser(tj.getLoginChat(),tj.getPasswordChat());
+        // tajnosti tj = new tajnosti();
+        // new Database().insertNewUser(tj.getLoginChat(),tj.getPasswordChat());
 
         // posielam spravu :D  // Brano      kristianS
         // new Database().sendMessage(10," ..komu.. "," ..text.. ");
 
         // prezeram všetky spravy premňa ;)
-       // new Output().printMyMessages(new Database().getMyMessages("DANKO"));
-
-      //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
+        //new Output().printMyMessages(new Database().getMyMessages("DANKO"));
+          new Database().deleteAllMyMessages("DANKO");
+        //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
 
     }
 }
