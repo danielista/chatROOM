@@ -28,11 +28,14 @@ import sk.kosickaakademia.martinek.chat.out.Output;
 
 
 public class Main extends Application {
-
+    Stage window;
+    Scene chatRoomWindow;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        window = primaryStage;
+
 
         Text login = new Text("Login");
         Text password = new Text("Password");
@@ -51,44 +54,32 @@ public class Main extends Application {
         button1.setText("Login me");
         button1.setPrefWidth(70);
         button1.setStyle("-fx-background-color: green; \n" +
-                "   -fx-text-fill: white; ");
-        button1.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                System.out.println("OOOOOOOOO yeah");
-                String login = loginInputText.getText().trim();
-                String password = passwordInputText.getText().trim();
-                if(login.length()>0 && password.length()>0){
-                    Database db = new Database();
-                    User user = db.loginUser(login,password);
-                    if(user==null){
-                        errorLabel.setVisible(true);
-                    }else{
-                        System.out.println("Success! You are logged!");
-                    }
+                         "-fx-text-fill: white; ");
+        button1.setOnAction(event -> {
+            System.out.println("OOOOOOOOO yeah");
+            String login1 = loginInputText.getText().trim();
+            String password1 = passwordInputText.getText().trim();
+            if(login1.length()>0 && password1.length()>0){
+                Database db = new Database();
+                User user = db.loginUser(login1,password1);
+                if(user==null){
+                    errorLabel.setVisible(true);
+                }else{
+                    System.out.println("Success! You are logged!");
+                    window.setScene(chatRoomWindow);
                 }
-
-
             }
         });
 
-
         Button button2 = new Button("Clear");
-        button2.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                loginInputText.setText("");
-                passwordInputText.setText("");
-            }
+        button2.setOnAction(event -> {
+            loginInputText.setText("");
+            passwordInputText.setText("");
         });
 
         //Creating a Grid Pane
         GridPane gridPane = new GridPane();
-
-        //Setting size for the pane
         gridPane.setMinSize(400, 200);
-
-        //Setting the padding
         gridPane.setPadding(new Insets(10, 10, 10, 10));
 
         //Setting the vertical and horizontal gaps between the columns
@@ -108,16 +99,23 @@ public class Main extends Application {
         gridPane.add(errorLabel,0,2);
 
         //Creating a scene object
-        Scene scene = new Scene(gridPane);
+        Scene loginWindow = new Scene(gridPane);
+
+        Pane chatroomPane = new Pane();
+        chatroomPane.setMinSize(500,500);
+
+
+        chatRoomWindow = new Scene(chatroomPane,600,600);
+
 
         //Setting title to the Stage
-        primaryStage.setTitle("Chat ROOM 2021 1N");
+        window.setTitle("Chat ROOM 2021 1N/ LOGIN");
 
         //Adding scene to the stage
-        primaryStage.setScene(scene);
+        window.setScene(loginWindow);
 
         //Displaying the contents of the stage
-        primaryStage.show();
+        window.show();
 
 
 
@@ -133,7 +131,7 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-       // launch(args);  // spúšťanie formulára :D
+        launch(args);  // spúšťanie formulára :D
 
         // tajnosti tj = new tajnosti();
         // new Database().insertNewUser(tj.getLoginChat(),tj.getPasswordChat());
@@ -142,8 +140,8 @@ public class Main extends Application {
         // new Database().sendMessage(10," ..komu.. "," ..text.. ");
 
         // prezeram všetky spravy premňa ;)
-        //new Output().printMyMessages(new Database().getMyMessages("DANKO"));
-          new Database().deleteAllMyMessages("DANKO");
+        new Output().printMyMessages(new Database().getMyMessages("DANKO"));
+         // new Database().deleteAllMyMessages("DANKO");
         //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
 
     }
