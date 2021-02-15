@@ -9,9 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.layout.Border;
@@ -29,7 +27,7 @@ import sk.kosickaakademia.martinek.chat.out.Output;
 
 public class Main extends Application {
     Stage window;
-    Scene chatRoomWindow;
+    Scene chatRoomWindow, loginWindow;
 
 
     @Override
@@ -41,7 +39,9 @@ public class Main extends Application {
         Text password = new Text("Password");
 
         TextField loginInputText = new TextField();
-        TextField passwordInputText = new TextField();
+        loginInputText.setPromptText("login name");
+        PasswordField passwordInputText = new PasswordField();
+        passwordInputText.setPromptText("Your password");
 
         Label errorLabel = new Label();
         errorLabel.setText("Nič tu nefunguje!!!");
@@ -66,6 +66,7 @@ public class Main extends Application {
                     errorLabel.setVisible(true);
                 }else{
                     System.out.println("Success! You are logged!");
+                    window.setTitle("CHATROOM 2021");
                     window.setScene(chatRoomWindow);
                 }
             }
@@ -99,13 +100,34 @@ public class Main extends Application {
         gridPane.add(errorLabel,0,2);
 
         //Creating a scene object
-        Scene loginWindow = new Scene(gridPane);
+        loginWindow = new Scene(gridPane);
 
-        Pane chatroomPane = new Pane();
+
+
+        //elementy na 2. scénu:
+        Label loginUser = new Label("logged as: ");
+        Label loginUserName = new Label("DANKO");  //dorob prepojenie
+        TextArea messagesArea = new TextArea();
+        messagesArea.setMaxWidth(400);
+        messagesArea.setMaxHeight(300);
+        messagesArea.setStyle("-fx-margin: 20");
+        messagesArea.setEditable(false);
+
+        // 2. scéna:
+        BorderPane chatroomPane = new BorderPane();
         chatroomPane.setMinSize(500,500);
+
+        BorderPane.setAlignment(loginUserName,Pos.TOP_CENTER);
+        BorderPane.setMargin(loginUserName,new Insets(10,10,10,10));
+        BorderPane.setAlignment(loginUser,Pos.TOP_LEFT);
+        chatroomPane.setTop(loginUser);
+        chatroomPane.setTop(loginUserName);
+        chatroomPane.setCenter(messagesArea);
+
 
 
         chatRoomWindow = new Scene(chatroomPane,600,600);
+
 
 
         //Setting title to the Stage

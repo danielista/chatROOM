@@ -231,7 +231,7 @@ public class Database {
             PreparedStatement ps = con.prepareStatement( deleteMyMessages );
             ps.setInt(1,Idecko);
             // ResultSet rs = ps.executeQuery();
-            ps.executeUpdate();
+            ps.executeUpdate();  // vyhodí číslo kolko riadkov zmazalo ;)
 
             System.out.println("schránka je prázdna");
             con.close();
