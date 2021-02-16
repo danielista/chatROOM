@@ -127,11 +127,7 @@ public class Main extends Application {
                 window.setScene(newMessageScene);
             });
         Button refreshButton = new Button("REFRESH");
-        refreshButton.setOnAction(event -> {
-                String spravy = out.printMyMessages(db.getMyMessages("DANKO"));
-                messagesArea.setText(spravy);
-
-            });
+        refreshButton.setOnAction(event ->  tableOfMessages.setItems(getMes()));
         Button logoutButton = new Button("LOGOUT");
 
     // TABLUKA SPRAV
@@ -152,8 +148,7 @@ public class Main extends Application {
 
         tableOfMessages = new TableView<>();
         tableOfMessages.getColumns().addAll(nameColumn,nameColumn2,nameColumn3);
-        tableOfMessages.setItems(getMes());  //metoda dole //ten DATETIME hapruje
-
+        tableOfMessages.setItems(getMes());
 
 
         // hore  meno prihlaseneho
@@ -187,7 +182,7 @@ public class Main extends Application {
         Label textSpravy = new Label("Text správy: ");
             ChoiceBox<String> friends = new ChoiceBox<>();
             friends.setValue("Choose from the list of friends");
-            friends.getItems().addAll("Brano","kristianS","Simon");
+            friends.getItems().addAll("Brano","kristianS","Simon","DANKO");
 
         //TextField komuTextField = new TextField();
         TextArea teloSpravy = new TextArea();
