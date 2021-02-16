@@ -6,7 +6,7 @@ public class Message {
     private int id;
 
     // na výpis mojich nových prijatých správ
-    public Message(String from, String text, Date dt) {
+    public Message(String from, String text, String dt) {
         this.from = from;
         this.dt = dt;
         this.text = text;
@@ -14,10 +14,11 @@ public class Message {
 
     private String from;
     private String to;
-    private Date dt;
+    //private Date dt;
+    private String dt;
     private String text;
 
-    public Message(int id, String from, String to, Date dt, String text) {
+    public Message(int id, String from, String to, String dt, String text) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -37,7 +38,7 @@ public class Message {
         return to;
     }
 
-    public Date getDt() {
+    public String getDt() {
         return dt;
     }
 

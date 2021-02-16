@@ -1,37 +1,37 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sk.kosickaakademia.martinek.chat.database.Database;
-import sk.kosickaakademia.martinek.chat.database.tajnosti;
+import sk.kosickaakademia.martinek.chat.entity.Message;
 import sk.kosickaakademia.martinek.chat.entity.User;
 import sk.kosickaakademia.martinek.chat.out.Output;
 
-import static javafx.scene.layout.GridPane.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
+
 
 
 public class Main extends Application {
     Stage window;
     Scene chatRoomWindow, loginWindow, newMessageScene;
-
+    Database db = new Database();
+    Output out = new Output();
+    TableView<Message> tableOfMessages;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -108,35 +108,62 @@ public class Main extends Application {
 
 
 
+        // 2. scéna:
         //elementy na 2. scénu:
-        Label loginUser = new Label("logged as: ");
-        Label loginUserName = new Label("DANKO");  //dorob prepojenie
-
-        Button newMessageButton = new Button("NEW message");
-        newMessageButton.setOnAction(event -> {
-            window.setTitle("NEW MESSAGE");
-            window.setScene(newMessageScene);
-        });
-        Button refreshButton = new Button("REFRESH");
-        Button logoutButton = new Button("LOGOUT");
-
         TextArea messagesArea = new TextArea();
         messagesArea.setMaxWidth(400);
         messagesArea.setMaxHeight(300);
         messagesArea.setStyle("-fx-margin: 20");
         messagesArea.setEditable(false);
 
-        // 2. scéna:
+        Label loginUser = new Label("logged as: ");
+        Label loginUserName = new Label("DANKO");  //dorob prepojenie
+        Label dateTimeActual = new Label(out.actualDateTime());
+        Button refreshTime = new Button("refresh me");
 
-        //Instantiating the HBox class
+        Button newMessageButton = new Button("NEW message");
+        newMessageButton.setOnAction(event -> {
+                window.setTitle("NEW MESSAGE");
+                window.setScene(newMessageScene);
+            });
+        Button refreshButton = new Button("REFRESH");
+        refreshButton.setOnAction(event -> {
+                String spravy = out.printMyMessages(db.getMyMessages("DANKO"));
+                messagesArea.setText(spravy);
+
+            });
+        Button logoutButton = new Button("LOGOUT");
+
+    // TABLUKA SPRAV
+        //stlpec primatela
+    TableColumn<Message, String> nameColumn = new TableColumn<>("FROM");
+    nameColumn.setMinWidth(70);
+    nameColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
+
+        // stlpec textovych sprav
+        TableColumn<Message, String> nameColumn2 = new TableColumn<>("text správy");
+        nameColumn2.setMinWidth(400);
+        nameColumn2.setCellValueFactory(new PropertyValueFactory<>("text"));
+
+        // stlpec časov
+        TableColumn<Message, String> nameColumn3 = new TableColumn<>("DATE");
+        nameColumn3.setMinWidth(180);
+        nameColumn3.setCellValueFactory(new PropertyValueFactory<>("dt"));
+
+        tableOfMessages = new TableView<>();
+        tableOfMessages.getColumns().addAll(nameColumn,nameColumn2,nameColumn3);
+        tableOfMessages.setItems(getMes());  //metoda dole //ten DATETIME hapruje
+
+
+
+        // hore  meno prihlaseneho
         HBox hbox = new HBox();
-
-        //Setting the space between the nodes of a HBox pane
         hbox.setSpacing(10);
-        hbox.getChildren().addAll(loginUser,loginUserName);
+        hbox.getChildren().addAll(loginUser,loginUserName,dateTimeActual);
         //Setting the margin to the nodes
-        HBox.setMargin(loginUser, new Insets(10, 0, 0, 20));
-        HBox.setMargin(loginUserName, new Insets(10, 0, 0, 2));
+        HBox.setMargin(loginUser, new Insets(10, 0, 20, 20));
+        HBox.setMargin(loginUserName, new Insets(10, 10, 20, 2));
+        HBox.setMargin(dateTimeActual, new Insets(10, 0, 20, 2));
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(newMessageButton,refreshButton,logoutButton);
@@ -147,33 +174,59 @@ public class Main extends Application {
         chatroomPane.setMinSize(500,500);
 
         chatroomPane.setTop(hbox);
-        chatroomPane.setCenter(messagesArea);
+       // chatroomPane.setCenter(messagesArea); // tu dam tabulku
+        chatroomPane.setCenter(tableOfMessages);
         chatroomPane.setRight(vbox);
         chatroomPane.getRight().setRotate(20);
         chatroomPane.getRight().setTranslateX(-30);
 
+
+
         //NEW MESSAGE WINDOW ELEMENTS
-        Label komu = new Label("TO: ");
+        Label komu = new Label("Komu: ");
         Label textSpravy = new Label("Text správy: ");
-        TextField komuTextField = new TextField();
-        TextField teloSpravy = new TextField();
+            ChoiceBox<String> friends = new ChoiceBox<>();
+            friends.setValue("Choose from the list of friends");
+            friends.getItems().addAll("Brano","kristianS","Simon");
+
+        //TextField komuTextField = new TextField();
+        TextArea teloSpravy = new TextArea();
+            teloSpravy.setPrefHeight(60);
+            teloSpravy.setPrefWidth(240);
+        Button sendIt = new Button("SEND");
+            sendIt.setPrefWidth(60);
+            sendIt.setOnAction(event -> {
+                int from = 10;
+               // String toUser = komu.getText().trim();
+                String toUser = friends.getValue();
+                String text = teloSpravy.getText().trim();
+                db.sendMessage(from,toUser,text);
+                teloSpravy.setText("");
+                window.setTitle("CHATROOM 2021");
+                window.setScene(chatRoomWindow);
+            });
+
 
         //NEW MESSAGE GRID PANE
         GridPane newMessagePane = new GridPane();
+        gridPane.setMinSize(400, 200);
+        gridPane.setPadding(new Insets(10, 10, 10, 10));
         newMessagePane.setAlignment(Pos.CENTER);
 
         //Arranging all the nodes in the grid
         newMessagePane.add(komu, 0, 0);
         newMessagePane.add(textSpravy, 0, 1);
-        newMessagePane.add(komuTextField, 1, 0);
+      //  newMessagePane.add(komuTextField, 1, 0);
+        newMessagePane.add(friends,1,0);
         newMessagePane.add(teloSpravy, 1, 1);
+        newMessagePane.add(sendIt,1,3);
+        GridPane.setHalignment(sendIt,HPos.RIGHT);
 
 
         //Creating a scene object
         loginWindow = new Scene(gridPane);
-        chatRoomWindow = new Scene(chatroomPane,600,500);
-
-        newMessageScene = new Scene(newMessagePane);
+        chatRoomWindow = new Scene(chatroomPane,700,380);
+        newMessageScene = new Scene(newMessagePane,400,200);
 
 
 
@@ -198,6 +251,12 @@ public class Main extends Application {
 
     }
 
+    public ObservableList<Message> getMes(){
+        ObservableList<Message> mess = FXCollections.observableArrayList();
+        mess.addAll(db.getMyMessages("DANKO"));
+        return mess;
+    }
+
 
     public static void main(String[] args) {
         launch(args);  // spúšťanie formulára :D
@@ -209,9 +268,10 @@ public class Main extends Application {
         // new Database().sendMessage(10," ..komu.. "," ..text.. ");
 
         // prezeram všetky spravy premňa ;)
-        new Output().printMyMessages(new Database().getMyMessages("DANKO"));
+       // new Output().printMyMessages(new Database().getMyMessages("DANKO"));
          // new Database().deleteAllMyMessages("DANKO");
         //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
 
+        System.out.println(new Output().actualDateTime());;
     }
 }

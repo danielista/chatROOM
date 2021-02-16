@@ -5,12 +5,11 @@ import sk.kosickaakademia.martinek.chat.entity.User;
 import sk.kosickaakademia.martinek.chat.util.Util;
 
 import java.sql.*;
+import java.util.Date;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Database {
 
@@ -203,13 +202,23 @@ public class Database {
             while (rs.next()){
                 String odKOHO = rs.getString("fromWHO");
                 String textSPRAVY = rs.getString("what");
+
+                  //  String pattern = "EEEEE dd MMMMM yyyy HH:mm:ss";
+         /*           String pattern = "yyyy-MM-dd HH:mm:ss";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, new Locale("en", "US"));
+
                 //DateTimeFormatter = rs.getDate("timeWHEN");
                 //Time casOdoslania  = rs.getDate("timeWHEN");
                 Date casOdoslania = rs.getDate("timeWHEN");
 
+          */
+             //   String date = simpleDateFormat.format(casOdoslania);
+                String date = rs.getString("timeWhen");
+
+
 
                 // System.out.println(odKOHO +  " \"" + textSPRAVY + "\" " + casOdoslania);
-                Message sprava = new Message(odKOHO,textSPRAVY,casOdoslania);
+                Message sprava = new Message(odKOHO,textSPRAVY,date);
                 messeges.add(sprava);
 
               //  deleteAllMyMessages("DANKO");
