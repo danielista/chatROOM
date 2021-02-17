@@ -122,13 +122,19 @@ public class Main extends Application {
         Button refreshTime = new Button("refresh me");
 
         Button newMessageButton = new Button("NEW message");
-        newMessageButton.setOnAction(event -> {
-                window.setTitle("NEW MESSAGE");
-                window.setScene(newMessageScene);
-            });
+            newMessageButton.setOnAction(event -> {
+                    window.setTitle("NEW MESSAGE");
+                    window.setScene(newMessageScene);
+                });
         Button refreshButton = new Button("REFRESH");
-        refreshButton.setOnAction(event ->  tableOfMessages.setItems(getMes()));
+            refreshButton.setOnAction(event ->  tableOfMessages.setItems(getMes()));
         Button logoutButton = new Button("LOGOUT");
+            logoutButton.setOnAction(event -> {
+                window.setTitle("Chat ROOM 2021 1N/ LOGIN");
+                window.setScene(loginWindow);
+                loginInputText.setText("");
+                passwordInputText.setText("");
+            });
 
     // TABLUKA SPRAV
         //stlpec primatela
@@ -182,7 +188,7 @@ public class Main extends Application {
         Label textSpravy = new Label("Text správy: ");
             ChoiceBox<String> friends = new ChoiceBox<>();
             friends.setValue("Choose from the list of friends");
-            friends.getItems().addAll("Brano","kristianS","Simon","DANKO");
+            friends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine");
 
         //TextField komuTextField = new TextField();
         TextArea teloSpravy = new TextArea();
@@ -227,8 +233,6 @@ public class Main extends Application {
 
         //Setting title to the Stage
         window.setTitle("Chat ROOM 2021 1N/ LOGIN");
-
-        //Adding scene to the stage
         window.setScene(loginWindow);
 
         //Displaying the contents of the stage
@@ -267,6 +271,6 @@ public class Main extends Application {
          // new Database().deleteAllMyMessages("DANKO");
         //  new Database().changePassword("DANKO","406068e1638b16699da096f61f331111", tj.getPasswordChat());
 
-        System.out.println(new Output().actualDateTime());;
+        System.out.println(new Output().actualDateTime() + "bye bye ;)");;
     }
 }
