@@ -1,5 +1,8 @@
 package sk.kosickaakademia.martinek.chat.database;
 
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import sk.kosickaakademia.martinek.chat.entity.Message;
 import sk.kosickaakademia.martinek.chat.entity.User;
 import sk.kosickaakademia.martinek.chat.util.Util;
@@ -183,7 +186,7 @@ public class Database {
             return -1;
     }
 
-    public List<Message> getMyMessages(String login){
+    public ObservableList<Message> getMyMessages(String login){
 
         int Idecko = getUserId(login);
         if(Idecko==-1){
@@ -191,7 +194,8 @@ public class Database {
             return null;
         }
 
-        ArrayList<Message> messeges = new ArrayList<>();
+        //ArrayList<Message> messeges = new ArrayList<>();
+        ObservableList<Message> messeges2 = FXCollections.observableArrayList();
 
         try {
             Connection con = getConnection();
@@ -219,7 +223,8 @@ public class Database {
 
                 // System.out.println(odKOHO +  " \"" + textSPRAVY + "\" " + casOdoslania);
                 Message sprava = new Message(odKOHO,textSPRAVY,date);
-                messeges.add(sprava);
+              //  messeges.add(sprava);
+                messeges2.add(sprava);
 
               //  deleteAllMyMessages("DANKO");
             }
@@ -228,7 +233,8 @@ public class Database {
             e.printStackTrace();
         }
 
-        return messeges;
+        //return messeges;
+        return messeges2;
     }
 
     public void deleteAllMyMessages(String login){

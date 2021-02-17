@@ -25,7 +25,7 @@ public class Output {
                 new SimpleDateFormat(pattern, new Locale("en", "US"));
 
         String date = simpleDateFormat.format(new Date());
-        return "It is now: "+ date;
+        return date;
     }
 
 }

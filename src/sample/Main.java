@@ -9,8 +9,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -18,11 +20,6 @@ import sk.kosickaakademia.martinek.chat.database.Database;
 import sk.kosickaakademia.martinek.chat.entity.Message;
 import sk.kosickaakademia.martinek.chat.entity.User;
 import sk.kosickaakademia.martinek.chat.out.Output;
-
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
 
 
 
@@ -34,8 +31,8 @@ public class Main extends Application {
     TableView<Message> tableOfMessages;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
+    public void start(Stage window) throws Exception {
+
 
 
         Text login = new Text("Login");
@@ -48,38 +45,40 @@ public class Main extends Application {
         passwordInputText.setPromptText("Type your password here");
 
         Label errorLabel = new Label();
-        errorLabel.setText("Nič tu nefunguje!!!");
+        errorLabel.setText("Incorrect login or password.");
         errorLabel.setTextFill(Color.web("#FF0000"));
         errorLabel.setStyle("-fx-font: normal italic 12px 'calibri' ");
         errorLabel.setVisible(false);
 
         //Creating Buttons
         Button button1 = new Button();
-        button1.setText("Login me");
-        button1.setPrefWidth(70);
-        button1.setStyle("-fx-background-color: green; \n" +
-                         "-fx-text-fill: white; ");
-        button1.setOnAction(event -> {
-            System.out.println("OOOOOOOOO yeah");
-            String login1 = loginInputText.getText().trim();
-            String password1 = passwordInputText.getText().trim();
-            if(login1.length()>0 && password1.length()>0){
-                Database db = new Database();
-                User user = db.loginUser(login1,password1);
-                if(user==null){
-                    errorLabel.setVisible(true);
-                }else{
-                    System.out.println("Success! You are logged!");
-                    window.setTitle("CHATROOM 2021");
-                    window.setScene(chatRoomWindow);
+            button1.setText("Login me");
+            button1.setPrefWidth(70);
+            button1.setStyle("-fx-background-color: green; \n" +
+                             "-fx-text-fill: white; ");
+            button1.setOnAction(event -> {
+                System.out.println("OOOOOOOOO yeah");
+                String login1 = loginInputText.getText().trim();
+                String password1 = passwordInputText.getText().trim();
+                if(login1.length()>0 && password1.length()>0){
+                    Database db = new Database();
+                    User user = db.loginUser(login1,password1);
+                    if(user==null){
+                        errorLabel.setVisible(true);
+                    }else{
+                        System.out.println("Success! You are logged!");
+                        window.setTitle("CHATROOM 2021");
+                        tableOfMessages.setItems(db.getMyMessages(loginInputText.getText().trim()));
+                        window.setScene(chatRoomWindow);
+                    }
                 }
-            }
-        });
+            });
 
         Button button2 = new Button("Clear");
         button2.setOnAction(event -> {
             loginInputText.setText("");
             passwordInputText.setText("");
+            errorLabel.setVisible(false);
         });
 
         //Creating a Grid Pane
@@ -103,58 +102,101 @@ public class Main extends Application {
         gridPane.add(button2, 1, 3);
         GridPane.setHalignment(button2,HPos.RIGHT);
 
-        gridPane.add(errorLabel,0,2);
+        gridPane.add(errorLabel,1,2);
+
+
+
 
 
 
 
         // 2. scéna:
         //elementy na 2. scénu:
-        TextArea messagesArea = new TextArea();
-        messagesArea.setMaxWidth(400);
-        messagesArea.setMaxHeight(300);
-        messagesArea.setStyle("-fx-margin: 20");
-        messagesArea.setEditable(false);
-
-        Label loginUser = new Label("logged as: ");
-        Label loginUserName = new Label("DANKO");  //dorob prepojenie
+        Label loginUser = new Label("CHATROOM 2021                      Logged at: ");
+        Label loginUserName = new Label("DANKO");
+        loginUserName.textProperty().bind(loginInputText.textProperty());
         Label dateTimeActual = new Label(out.actualDateTime());
-        Button refreshTime = new Button("refresh me");
+
 
         Button newMessageButton = new Button("NEW message");
+            newMessageButton.setStyle("");
             newMessageButton.setOnAction(event -> {
                     window.setTitle("NEW MESSAGE");
                     window.setScene(newMessageScene);
                 });
-        Button refreshButton = new Button("REFRESH");
-            refreshButton.setOnAction(event ->  tableOfMessages.setItems(getMes()));
-        Button logoutButton = new Button("LOGOUT");
+        Button refreshButton = new Button("Refresh");
+        //  refreshButton.setOnAction(event ->  tableOfMessages.setItems(getMes()));
+            refreshButton.setOnAction(event ->  tableOfMessages.setItems(db.getMyMessages(loginInputText.getText().trim())));
+        Button logoutButton = new Button("Log-out");
             logoutButton.setOnAction(event -> {
                 window.setTitle("Chat ROOM 2021 1N/ LOGIN");
                 window.setScene(loginWindow);
                 loginInputText.setText("");
                 passwordInputText.setText("");
+                errorLabel.setVisible(false);
             });
 
-    // TABLUKA SPRAV
-        //stlpec primatela
-    TableColumn<Message, String> nameColumn = new TableColumn<>("FROM");
-    nameColumn.setMinWidth(70);
-    nameColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
+            // TABLUKA SPRAV
+            // stlpec primatela
+            TableColumn<Message, String> nameColumn = new TableColumn<>("FROM");
+            nameColumn.setMinWidth(70);
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
 
-        // stlpec textovych sprav
-        TableColumn<Message, String> nameColumn2 = new TableColumn<>("text správy");
-        nameColumn2.setMinWidth(400);
-        nameColumn2.setCellValueFactory(new PropertyValueFactory<>("text"));
+            // stlpec textovych sprav
+            TableColumn<Message, String> nameColumn2 = new TableColumn<>("text správy");
+            nameColumn2.setMinWidth(400);
+            nameColumn2.setCellValueFactory(new PropertyValueFactory<>("text"));
 
-        // stlpec časov
-        TableColumn<Message, String> nameColumn3 = new TableColumn<>("DATE");
-        nameColumn3.setMinWidth(180);
-        nameColumn3.setCellValueFactory(new PropertyValueFactory<>("dt"));
+            // stlpec časov
+            TableColumn<Message, String> nameColumn3 = new TableColumn<>("DATE");
+            nameColumn3.setMinWidth(180);
+            nameColumn3.setCellValueFactory(new PropertyValueFactory<>("dt"));
 
-        tableOfMessages = new TableView<>();
-        tableOfMessages.getColumns().addAll(nameColumn,nameColumn2,nameColumn3);
-        tableOfMessages.setItems(getMes());
+            tableOfMessages = new TableView<>();
+            tableOfMessages.getColumns().addAll(nameColumn,nameColumn2,nameColumn3);
+          //  tableOfMessages.setItems(getMes());
+
+        tableOfMessages.setItems(db.getMyMessages(loginInputText.getText().trim()));
+
+
+        // BOTTOM BAR ;)
+        Button deleteButton = new Button("Delete message");
+
+        HBox bottomBar = new HBox();
+        bottomBar.setPadding(new Insets(10,10,10,10));
+        bottomBar.setSpacing(10);
+        bottomBar.getChildren().addAll(deleteButton,newMessageButton,refreshButton,logoutButton);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+
+//stále 2. scéna :D
+//Menu menu = new ChatMenu().chatMenu(loginUserName.getText());
+Menu firstOptionMenu = new Menu("_",loginUserName);
+firstOptionMenu.setText(loginInputText.getText().trim());
+
+MenuItem newMessItem = new MenuItem("New message to...");
+    newMessItem.setOnAction(event -> {
+        window.setTitle("NEW MESSAGE");
+        window.setScene(newMessageScene);
+    });
+firstOptionMenu.getItems().add(newMessItem);
+
+firstOptionMenu.getItems().add(new MenuItem("Change my password..."));
+firstOptionMenu.getItems().add(new SeparatorMenuItem());
+firstOptionMenu.getItems().add(new MenuItem("Exit"));
+
+
+        Menu help = new Menu("Help");
+        MenuItem about = new MenuItem("About");
+        about.setDisable(true);
+        about.setOnAction(event -> {
+            window.setTitle("ABOUT");
+            // dokončiť window s info o aplikácii :D
+        });
+        help.getItems().add(about);
+
+MenuBar menuBar = new MenuBar();
+menuBar.getMenus().addAll(firstOptionMenu,help);
+
 
 
         // hore  meno prihlaseneho
@@ -166,20 +208,28 @@ public class Main extends Application {
         HBox.setMargin(loginUserName, new Insets(10, 10, 20, 2));
         HBox.setMargin(dateTimeActual, new Insets(10, 0, 20, 2));
 
+        VBox horeMenuAprvyRiadok = new VBox();
+        horeMenuAprvyRiadok.getChildren().addAll(menuBar,hbox);
+
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(newMessageButton,refreshButton,logoutButton);
-        vbox.setAlignment(Pos.CENTER);
+
+        //vbox.getChildren().addAll(newMessageButton,refreshButton,logoutButton);
+        vbox.setAlignment(Pos.TOP_CENTER);
+
         vbox.setSpacing(10);
 
         BorderPane chatroomPane = new BorderPane();
         chatroomPane.setMinSize(500,500);
 
-        chatroomPane.setTop(hbox);
-       // chatroomPane.setCenter(messagesArea); // tu dam tabulku
+        chatroomPane.setTop(horeMenuAprvyRiadok);
+
         chatroomPane.setCenter(tableOfMessages);
+
         chatroomPane.setRight(vbox);
-        chatroomPane.getRight().setRotate(20);
-        chatroomPane.getRight().setTranslateX(-30);
+
+        chatroomPane.setBottom(bottomBar);
+
+        chatroomPane.getBoundsInParent();
 
 
 
@@ -188,7 +238,7 @@ public class Main extends Application {
         Label textSpravy = new Label("Text správy: ");
             ChoiceBox<String> friends = new ChoiceBox<>();
             friends.setValue("Choose from the list of friends");
-            friends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine");
+            friends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine","Roman","Kubo");
 
         //TextField komuTextField = new TextField();
         TextArea teloSpravy = new TextArea();
@@ -226,14 +276,18 @@ public class Main extends Application {
 
         //Creating a scene object
         loginWindow = new Scene(gridPane);
-        chatRoomWindow = new Scene(chatroomPane,700,380);
+        gridPane.setStyle("-fx-background-color: BEIGE;");
+        chatRoomWindow = new Scene(chatroomPane,680,500);
+        chatroomPane.setStyle("-fx-background-color: BEIGE;");
         newMessageScene = new Scene(newMessagePane,400,200);
+        newMessagePane.setStyle("-fx-background-color: BEIGE;");
 
 
 
         //Setting title to the Stage
         window.setTitle("Chat ROOM 2021 1N/ LOGIN");
         window.setScene(loginWindow);
+
 
         //Displaying the contents of the stage
         window.show();
@@ -252,6 +306,7 @@ public class Main extends Application {
 
     public ObservableList<Message> getMes(){
         ObservableList<Message> mess = FXCollections.observableArrayList();
+
         mess.addAll(db.getMyMessages("DANKO"));
         return mess;
     }
