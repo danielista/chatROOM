@@ -1,19 +1,22 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.Reflection;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sk.kosickaakademia.martinek.chat.database.Database;
@@ -112,7 +115,11 @@ public class Main extends Application {
 
         // 2. scéna:
         //elementy na 2. scénu:
-        Label loginUser = new Label("CHATROOM 2021                      Logged at: ");
+        Label nazovAplikacie = new Label("DATABASE MESSANGER 1N 2021");
+        nazovAplikacie.setStyle("-fx-font: 20px helvetica;");
+        nazovAplikacie.setStyle(" -fx-font-size: 30;" +
+                "-fx-font-style: italic;");
+
         Label loginUserName = new Label("DANKO");
         loginUserName.textProperty().bind(loginInputText.textProperty());
         Label dateTimeActual = new Label(out.actualDateTime());
@@ -160,12 +167,21 @@ public class Main extends Application {
 
 
         // BOTTOM BAR ;)
-        Button deleteButton = new Button("Delete message");
+        Button deleteButton = new Button("Delete all my messages");
+        deleteButton.setOnAction(event -> {
+            ObservableList<Message> messageSelected, allMessages;
+            allMessages = tableOfMessages.getItems();
+            messageSelected = tableOfMessages.getSelectionModel().getSelectedItems();
+
+            messageSelected.forEach(allMessages::remove);
+            db.deleteAllMyMessages(loginInputText.getText());
+            tableOfMessages.setItems(db.getMyMessages(loginInputText.getText().trim()));
+        });
 
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(10,10,10,10));
         bottomBar.setSpacing(10);
-        bottomBar.getChildren().addAll(deleteButton,newMessageButton,refreshButton,logoutButton);
+        bottomBar.getChildren().addAll(dateTimeActual,deleteButton,newMessageButton,refreshButton,logoutButton);
         bottomBar.setAlignment(Pos.CENTER_RIGHT);
 
 //stále 2. scéna :D
@@ -202,15 +218,16 @@ menuBar.getMenus().addAll(firstOptionMenu,help);
         // hore  meno prihlaseneho
         HBox hbox = new HBox();
         hbox.setSpacing(10);
-        hbox.getChildren().addAll(loginUser,loginUserName,dateTimeActual);
+       // hbox.getChildren().addAll(nazovAplikacie,loginUserName,dateTimeActual);
+        hbox.getChildren().addAll(nazovAplikacie,loginUserName);
         //Setting the margin to the nodes
-        HBox.setMargin(loginUser, new Insets(10, 0, 20, 20));
+        HBox.setMargin(nazovAplikacie, new Insets(10, 0, 20, 20));
         HBox.setMargin(loginUserName, new Insets(10, 10, 20, 2));
-        HBox.setMargin(dateTimeActual, new Insets(10, 0, 20, 2));
+      //  HBox.setMargin(dateTimeActual, new Insets(10, 0, 20, 2));
 
         VBox horeMenuAprvyRiadok = new VBox();
         horeMenuAprvyRiadok.getChildren().addAll(menuBar,hbox);
-
+        hbox.setAlignment(Pos.CENTER);
         VBox vbox = new VBox();
 
         //vbox.getChildren().addAll(newMessageButton,refreshButton,logoutButton);
@@ -219,11 +236,12 @@ menuBar.getMenus().addAll(firstOptionMenu,help);
         vbox.setSpacing(10);
 
         BorderPane chatroomPane = new BorderPane();
-        chatroomPane.setMinSize(500,500);
+        chatroomPane.setMinSize(400,400);
 
         chatroomPane.setTop(horeMenuAprvyRiadok);
 
         chatroomPane.setCenter(tableOfMessages);
+        chatroomPane.getCenter().cursorProperty().set(Cursor.CLOSED_HAND);
 
         chatroomPane.setRight(vbox);
 
@@ -236,22 +254,34 @@ menuBar.getMenus().addAll(firstOptionMenu,help);
         //NEW MESSAGE WINDOW ELEMENTS
         Label komu = new Label("Komu: ");
         Label textSpravy = new Label("Text správy: ");
-            ChoiceBox<String> friends = new ChoiceBox<>();
-            friends.setValue("Choose from the list of friends");
-            friends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine","Roman","Kubo");
+        ComboBox<String> listOfFriends = new ComboBox<>();
+        listOfFriends.setEditable(true);
+        listOfFriends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine","Roman","Kubo");
+        listOfFriends.setPromptText("Choose or type new friend");
+        listOfFriends.setPrefWidth(240);
+
+    //    ChoiceBox<String> friends = new ChoiceBox<>();
+      //      friends.setValue("Choose from the list of friends");
+        //    friends.getItems().addAll("Brano","kristianS","Simon","DANKO","CaptainUkraine","Roman","Kubo");
 
         //TextField komuTextField = new TextField();
         TextArea teloSpravy = new TextArea();
             teloSpravy.setPrefHeight(60);
             teloSpravy.setPrefWidth(240);
+            teloSpravy.setPromptText("type your message here...");
         Button sendIt = new Button("SEND");
             sendIt.setPrefWidth(60);
             sendIt.setOnAction(event -> {
                 int from = 10;
+                from = db.getUserId(loginUserName.getText());
                // String toUser = komu.getText().trim();
-                String toUser = friends.getValue();
+                //String toUser = friends.getValue();
+                String toUser = listOfFriends.getValue();
                 String text = teloSpravy.getText().trim();
-                db.sendMessage(from,toUser,text);
+               if (db.sendMessage(from,toUser,text)==true){
+                   listOfFriends.getItems().add(listOfFriends.getValue());
+                   listOfFriends.setAccessibleText("DANKO"); //neviem načo je ten accesibletext:D
+               }
                 teloSpravy.setText("");
                 window.setTitle("CHATROOM 2021");
                 window.setScene(chatRoomWindow);
@@ -264,11 +294,12 @@ menuBar.getMenus().addAll(firstOptionMenu,help);
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         newMessagePane.setAlignment(Pos.CENTER);
 
-        //Arranging all the nodes in the grid
+        // Arranging all the nodes in the grid
         newMessagePane.add(komu, 0, 0);
         newMessagePane.add(textSpravy, 0, 1);
-      //  newMessagePane.add(komuTextField, 1, 0);
-        newMessagePane.add(friends,1,0);
+        // newMessagePane.add(komuTextField, 1, 0);
+        //newMessagePane.add(friends,1,0);
+        newMessagePane.add(listOfFriends,1,0);
         newMessagePane.add(teloSpravy, 1, 1);
         newMessagePane.add(sendIt,1,3);
         GridPane.setHalignment(sendIt,HPos.RIGHT);
@@ -283,32 +314,31 @@ menuBar.getMenus().addAll(firstOptionMenu,help);
         newMessagePane.setStyle("-fx-background-color: BEIGE;");
 
 
-
         //Setting title to the Stage
         window.setTitle("Chat ROOM 2021 1N/ LOGIN");
         window.setScene(loginWindow);
 
-
-        //Displaying the contents of the stage
         window.show();
-
-
-
-/*
-        // Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-
-        primaryStage.setTitle("Chat room 1N 2021");
-        primaryStage.setScene(new Scene(root, 500, 300));
-        primaryStage.show();
-        */
 
     }
 
-    public ObservableList<Message> getMes(){
-        ObservableList<Message> mess = FXCollections.observableArrayList();
 
-        mess.addAll(db.getMyMessages("DANKO"));
-        return mess;
+    public Text nazov(){
+        Text t = new Text();
+        t.setX(10.0f);
+        t.setY(50.0f);
+        t.setCache(true);
+        t.setText("Reflections on JavaFX...");
+        t.setFill(Color.RED);
+        t.setFont(Font.font(null, FontWeight.BOLD, 30));
+
+        Reflection r = new Reflection();
+        r.setFraction(0.7f);
+
+        t.setEffect(r);
+
+        t.setTranslateY(400);
+        return t;
     }
 
 
