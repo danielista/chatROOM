@@ -115,7 +115,7 @@ public class Main extends Application {
 
         // 2. scéna:
         //elementy na 2. scénu:
-        Label nazovAplikacie = new Label("DATABASE MESSANGER 1N 2021");
+        Label nazovAplikacie = new Label("DATABASE MESSENGER 1N 2021");
         nazovAplikacie.setStyle("-fx-font: 20px helvetica;");
         nazovAplikacie.setStyle(" -fx-font-size: 30;" +
                 "-fx-font-style: italic;");
@@ -196,7 +196,46 @@ MenuItem newMessItem = new MenuItem("New message to...");
     });
 firstOptionMenu.getItems().add(newMessItem);
 
-firstOptionMenu.getItems().add(new MenuItem("Change my password..."));
+MenuItem changePassOption = new MenuItem("Change my password...");
+    changePassOption.setOnAction(event -> {
+        window.setTitle("CHANGING THE PASSWORD");
+        GridPane zmenaHeslaGridPane = new GridPane();
+        zmenaHeslaGridPane.setStyle("-fx-background-color: BEIGE;");
+
+        zmenaHeslaGridPane.setAlignment(Pos.CENTER);
+        Label oldPass = new Label("Old password");
+        Label newPass = new Label("New password");
+        Label againNewPass = new Label("Repeat new password");
+        TextField oldF = new TextField();
+        oldF.setPromptText("old password");
+        TextField newF =  new TextField();
+        newF.setPromptText("new password");
+        TextField newAgain = new TextField();
+        newAgain.setPromptText("new password");
+        Label errorChange = new Label("Incorret DATA");
+        errorChange.setVisible(false);
+        Button confirmation = new Button("Confirm changing the password");
+
+        zmenaHeslaGridPane.setPadding(new Insets(10, 10, 10, 10));
+        zmenaHeslaGridPane.setVgap(10);
+        zmenaHeslaGridPane.setHgap(5);
+        zmenaHeslaGridPane.setMinSize(400, 200);
+
+        zmenaHeslaGridPane.add(oldPass,0,0);
+        zmenaHeslaGridPane.add(newPass,0,1);
+        zmenaHeslaGridPane.add(againNewPass,0,2);
+
+        zmenaHeslaGridPane.add(oldF,1,0);
+        zmenaHeslaGridPane.add(newF,1,1);
+        zmenaHeslaGridPane.add(newAgain,1,2);
+
+        zmenaHeslaGridPane.add(confirmation,1,3);
+        zmenaHeslaGridPane.add(errorChange,0,3);
+        Scene changingPassScene = new Scene(zmenaHeslaGridPane);
+        window.setScene(changingPassScene);
+    });
+firstOptionMenu.getItems().add(changePassOption);
+
 firstOptionMenu.getItems().add(new SeparatorMenuItem());
 firstOptionMenu.getItems().add(new MenuItem("Exit"));
 
